@@ -8,13 +8,13 @@
 
 ## TODO 
 - [x] port and optimize [TuyaPy](https://pypi.org/project/tuyapy/)
-- [ ] implement CLI (see [CLI Examples](#examples))
+- [ ] implement CLI (see [Examples](#examples))
 - [ ] implement classes for other IoT devices (climate, fann, lock, etc.)
 - [ ] implement REST service
 - [ ] implement TUI (blessed-contrib)
 
 
-## CLI Examples
+## Examples 
 
 ```bash
 
