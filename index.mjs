@@ -29,7 +29,9 @@ const SESSION_FILE = process.cwd() + '/session.json';
             await client.init(env.HA_EMAIL, env.HA_PASS, env.HA_CC);
         } else {
             await client.load(session);
-            await client.discoverDevices();
+            if (!session?.devices) {
+                await client.discoverDevices();
+            }
         }
     } catch (e) {
         console.error('Error: Could not init Tuya session.', e);
@@ -54,7 +56,7 @@ const SESSION_FILE = process.cwd() + '/session.json';
         await sleep(500);
         
         log('Get device by Name...');
-        tBulb = client.getDeviceByName('Bulb');
+        tBulb = client.getDeviceByName('sebulb');
         log({tBulb});
         await sleep(500);
         
