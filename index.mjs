@@ -56,7 +56,7 @@ const SESSION_FILE = process.cwd() + '/session.json';
         await sleep(500);
         
         log('Get device by Name...');
-        tBulb = client.getDeviceByName('sebulb');
+        tBulb = client.getDeviceByName('Bulb');
         log({tBulb});
         await sleep(500);
         
