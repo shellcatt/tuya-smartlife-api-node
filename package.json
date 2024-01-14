@@ -1,7 +1,7 @@
 {
   "name": "tuya-homeassistant-api",
   "version": "0.5.0",
-  "description": "",
+  "description": "NodeJS interface for Tuya IoT devices through the SmartLife portal",
   "main": "index.js",
   "scripts": {
     "test": "node index.mjs"

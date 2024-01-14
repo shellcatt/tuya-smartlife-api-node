@@ -44,6 +44,10 @@ const SESSION_FILE = process.cwd() + '/session.json';
         console.dir(tDevices, { depth: null });
         await sleep(500);
         
+        if (!tDevices.length) {
+            log('No devices found.');
+            return;
+        }
         log('Get device by ID...');
         tSwitch = client.getDeviceById(tDevices.at(-1).objectId());
         log({tSwitch});

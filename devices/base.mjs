@@ -9,8 +9,15 @@ export class TuyaDevice {
     this.objName = data.name;
     this.devType = data.dev_type;
     this.icon = data.icon;
+    /* 
+     * Make the `api` rather "protected"
+     */
+    Object.defineProperty(this, 'api', {
+      value: api,
+      enumerable: false
+    });
   }
-
+  
   toJSON() {
     return {
       data: this.data,
