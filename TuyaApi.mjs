@@ -223,7 +223,7 @@ export class TuyaApi {
     const responseJson = await response.json();
 
     if (responseJson.header.code !== 'SUCCESS') {
-      console.debug(`control device error, error code is ${responseJson.header.code}`);
+      console.debug(`request '${name}' error, error code is ${responseJson.header.code}`);
     }
 
     return responseJson;
