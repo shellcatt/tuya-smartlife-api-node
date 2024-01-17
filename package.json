@@ -1,14 +1,19 @@
 {
-  "name": "tuya-homeassistant-api",
+  "name": "tuya-smartlife-api",
   "version": "0.5.0",
-  "description": "NodeJS interface for Tuya IoT devices through the SmartLife portal",
+  "description": "NodeJS interface for Tuya IoT devices through the SmartLife portal (HomeAssistant)",
   "main": "index.js",
   "scripts": {
     "test": "node index.mjs"
   },
-  "keywords": [],
+  "keywords": [
+    "tuya", 
+    "iot", 
+    "smartlife", 
+    "homeassistant"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.3.1",
     "node-fetch": "^3.3.2"

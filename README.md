@@ -1,4 +1,4 @@
-# Tuya HomeAssistant API (NodeJS)
+# Tuya Smart Life API (NodeJS)
 
 > Inspired by [TuyaPy](https://pypi.org/project/tuyapy/) (backend) and [SmartLife](https://github.com/ndg63276/smartlife) (web) interfaces to [Tuya](https://tuya.com/)'s **[SmartAtHome](https://smartathome.co.uk/smartlife/)** for IoT smart device control.
 
@@ -36,3 +36,6 @@ tuya --device <ID> --temperature 3500
 tuya --device <ID> -h 78.34 -s 1 -b 100 
 
 ```
+
+## About
+> Inspired by [TuyaAPI CLI](https://github.com/TuyaAPI/cli)

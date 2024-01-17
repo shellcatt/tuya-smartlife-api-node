@@ -17,7 +17,7 @@ const SESSION_FILE = process.cwd() + '/session.json';
     const client = new TuyaApi();
     let tDevices, tBulb, tSwitch;
     
-    log(fs.readFileSync(process.cwd() + '/tuya.asc').toString('utf8'));
+    log(fs.readFileSync(process.cwd() + '/tuya-home.asc').toString('utf8'));
     await sleep(500);
     
     log('Read session.json file...');
