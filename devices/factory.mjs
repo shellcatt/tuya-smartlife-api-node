@@ -1,4 +1,3 @@
-import { TuyaAPIException } from '../TuyaApi.mjs';
 import { TuyaLight } from './light.mjs';
 import { TuyaSwitch } from './switch.mjs';
 // import { TuyaClimate } from './climate.mjs';
@@ -30,10 +29,10 @@ export function getTuyaDevice(data, api) {
     // case 'lock':
     //   devices.push(new TuyaLock(data, api));
     //   break;
+    
     default:
-      let e = 'Unknown device type';
-      console.error(e);
-      throw new TuyaAPIException(e);
+      let e = `Unknown device type: ${data.dev_type}`;
+      throw new Error(e);
   }
 
 }

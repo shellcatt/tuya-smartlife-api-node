@@ -2,13 +2,16 @@ import { TuyaDevice } from './base.mjs';
 
 export class TuyaSwitch extends TuyaDevice {
   state() {
-    return this.data.state == true; //HACK: original value MAY be string
+    return ['true', true].includes(this.data.state); //HACK: original value is string
   }
 
   async turnOn() {
     let res = this.api.deviceControl(this.objectId, 'turnOnOff', { value: '1' });
     if (res[0]) {
       this.data.state = true;
+    } else {
+      console.error('could not turn on');
+      console.debug(res[1]);
     }
   }
 
@@ -16,6 +19,9 @@ export class TuyaSwitch extends TuyaDevice {
     let res = await this.api.deviceControl(this.objectId, 'turnOnOff', { value: '0' });
     if (res[0]) {
       this.data.state = false;
+    } else {
+      console.error('could not turn on');
+      console.debug(res[1]);
     }
   }
 }
