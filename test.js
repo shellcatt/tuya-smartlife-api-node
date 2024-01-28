@@ -3,6 +3,8 @@ import process from 'process';
 import fs from 'fs';
 import { log } from "console";
 import { promisify } from 'util';
+import beautify from 'json-beautify';
+
 import 'dotenv/config';
 
 const env = process.env;
@@ -98,7 +100,7 @@ const SESSION_FILE = process.cwd() + '/session.json';
 
     log('Store session.json file...');
     try {
-        fs.writeFileSync(SESSION_FILE, JSON.stringify(client.session));
+        fs.writeFileSync(SESSION_FILE, beautify(client.session, null, 2, 80));
         log('Success.');
     } catch (e) {
         console.error('Error: Could not save Tuya session cache.', e);

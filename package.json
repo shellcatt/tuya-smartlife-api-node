@@ -1,6 +1,6 @@
 {
   "name": "tuya-smartlife-api",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "NodeJS interface for Tuya IoT devices through the Smart Life interface",
   "main": "index.mjs",
   "type": "module",
@@ -22,6 +22,7 @@
     "commander": "^11.1.0",
     "debug": "^4.3.4",
     "dotenv": "^16.3.1",
+    "json-beautify": "^1.1.1",
     "node-fetch": "^3.3.2"
   }
 }

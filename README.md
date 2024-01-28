@@ -42,8 +42,8 @@ try {
 - [x] implement integration tests
 - [x] implement pure CLI (see [Examples](#examples))
   - [x] list devices (short / long format)
-  - [ ] control devices' state
-  - [ ] control devices' custom attributes
+  - [x] control a device's state
+  - [ ] control a device's custom attributes
 - [ ] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
 - [ ] implement unit tests
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
@@ -54,7 +54,7 @@ try {
 ```bash
 
 # List all devices
-node cli list
+node cli list [--format={short|long}]
 
 # Turn device ID on / off
 node cli control <ID|Name> --state 1

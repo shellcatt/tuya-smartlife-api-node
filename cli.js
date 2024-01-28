@@ -6,6 +6,10 @@ import Table from 'cli-table3';
 
 import fs from 'fs';
 import colors from '@colors/colors';
+import beautify from 'json-beautify';
+
+import initDebug from 'debug';
+const debug = initDebug('cli');
 
 import 'dotenv/config';
 
@@ -20,6 +24,11 @@ const SESSION_FILE = process.cwd() + '/session.json';
 const client = new TuyaSmartLifeClient();
 
 
+const actionMethods = {
+	'on': 'turnOn',
+	'off': 'turnOff',
+	'toggle': 'toggle',
+}
 const icons = {
 		'switch': `⏻ `,
 		'light': `𖤓`,
@@ -54,7 +63,7 @@ async function init() {
 
 async function finish() {
 	try {
-        fs.writeFileSync(SESSION_FILE, JSON.stringify(client.session));
+        fs.writeFileSync(SESSION_FILE, beautify(client.session, null, 2, 80));
     } catch (e) {
         console.error('Error: Could not save Tuya session cache.', e);
     }
@@ -86,8 +95,8 @@ function renderTable({ head, rows, widths }) {
 
 program
 	.command('list')
+	.description('list devices and their state / attributes')
 	.option('--format [short|long]', 'format output', 'short')
-	.description('list all devices')
 	.action(async (opts) => {
 		if (!['short', 'long'].includes(opts.format)) {
 			console.error('Error: Invalid format.');
@@ -128,6 +137,38 @@ program
 		await finish();
 	});
 
+program
+	.command('control')
+	.description('control a device\'s state')
+	.argument('<name>', 'device name')
+	.option('-s, --state [on|off]', 'device state')
+	.option('-t, --toggle', 'just invert')
+	.action(async (device, opts) => {
+		debug(device, {opts});
+
+		if (! Object.keys(actionMethods).includes(opts.state) && !opts.toggle) {
+			console.error('Error: Invalid format.');
+			return;
+		}
+
+		await init();
+
+		let tDevices = client.getAllDevices();
+		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
+			if (!dev.data.online) 
+				return;
+			if (opts.state) {
+				debug(`Invoking ${actionMethods[opts.state]} on ${dev.objName}`);
+				await dev[actionMethods[opts.state]]();
+			} else if (opts.toggle) {
+				debug(`Invoking toggle on ${dev.objName}`);
+				await dev.toggle();
+			}
+			return dev;
+		}));
+
+		await finish();
+	});
 
 // Get help
 program

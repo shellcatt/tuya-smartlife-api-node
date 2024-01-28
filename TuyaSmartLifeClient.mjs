@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { format } from 'util';
 import initDebug from 'debug';
-const debug = initDebug('TuyaSmartLifeClient');
+const debug = initDebug('api');
 
 import { getTuyaDevice } from './devices/factory.mjs'
 
