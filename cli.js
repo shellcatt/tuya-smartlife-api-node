@@ -141,15 +141,14 @@ program
 	.command('control')
 	.description('control a device\'s state')
 	.argument('<name>', 'device name')
-	.option('-s, --state [on|off]', 'device state')
-	.option('-t, --toggle', 'just invert')
+	.option('-s, --state [on|off]', 'set device state')
+	.option('-x, --toggle', 'invert device state')
+	.option('-b, --brightness [1-100]', 'set device brightness')
+	.option('-t, --temperature [2700-6500]', 'set device temperature (disables color mode)')
+	.option('-h, --hsl [h,s,l]', 'set light HSL color')
+	.option('-r, --rgb [r,g,b]', 'set light RGB color')
 	.action(async (device, opts) => {
 		debug(device, {opts});
-
-		if (! Object.keys(actionMethods).includes(opts.state) && !opts.toggle) {
-			console.error('Error: Invalid format.');
-			return;
-		}
 
 		await init();
 
@@ -157,13 +156,33 @@ program
 		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
 			if (!dev.data.online) 
 				return;
+
 			if (opts.state) {
+				if (!Object.keys(actionMethods).includes(opts.state)) {
+					console.error('Error: Invalid options format? Use DEBUG=cli');
+					return;
+				}
 				debug(`Invoking ${actionMethods[opts.state]} on ${dev.objName}`);
 				await dev[actionMethods[opts.state]]();
 			} else if (opts.toggle) {
 				debug(`Invoking toggle on ${dev.objName}`);
 				await dev.toggle();
+			} else if (opts.brightness) {
+				debug(`Invoking setBrightnes on ${dev.objName}`);
+				await dev.setBrightness(opts.brightness);
+			} else if (opts.temperature) {
+				debug(`Invoking setColorTemp on ${dev.objName}`);
+				await dev.setColorTemp(opts.temperature);
+			} else if (opts.hsl) {
+				const [ hue, saturation, brightness ] = opts.hsl.split(',');
+				debug(`Invoking setColor on ${dev.objName} with HSL: ${JSON.stringify({ hue, saturation, brightness })}`);
+				await dev.setColor({ hue, saturation, brightness });
+			} else if (opts.rgb) {
+				const [ red, green, blue ] = opts.rgb.split(',');
+				debug(`Invoking setColor on ${dev.objName} with RGB: ${JSON.stringify({ red, green, blue })}`);
+				await dev.setColorRGB({ red, green, blue });
 			}
+
 			return dev;
 		}));
 

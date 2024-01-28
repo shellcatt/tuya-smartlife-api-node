@@ -1,9 +1,10 @@
 import { TuyaSmartLifeClient, TuyaSmartLifeException } from "./TuyaSmartLifeClient.mjs";
 import process from 'process';
 import fs from 'fs';
-import { log } from "console";
 import { promisify } from 'util';
 import beautify from 'json-beautify';
+import select from '@inquirer/select';
+import { log } from "console";
 
 import 'dotenv/config';
 
@@ -43,55 +44,102 @@ const SESSION_FILE = process.cwd() + '/session.json';
     log('-----');
     await sleep(500);
     try {
-        tDevices = client.getAllDevices();
         log('Fetch device list...');
-        console.dir(tDevices, { depth: null });
-        await sleep(500);
+        tDevices = client.getAllDevices();
 
         if (!tDevices.length) {
             log('No devices found.');
             return;
         }
-        log('Get device by ID...');
-        tSwitch = client.getDeviceById(tDevices.at(-1).objectId());
-        log({ tSwitch });
-        await sleep(500);
 
-        log('Get device by Name...');
-        tBulb = client.getDeviceByName('Bulb');
-        log({ tBulb });
-        await sleep(500);
+        const answer = await select({
+            message: 'View result?',
+            choices: [
+                {
+                    name: 'yes',
+                    value: 'yes',
+                    description: 'Print JSON and continue'
+                },
+                {
+                    name: 'no',
+                    value: 'no',
+                    description: 'Continue'
+                }
+            ],
+            default: 'no'
+        });
+        if (answer == 'yes') {
+            console.dir(tDevices, { depth: null });
+        }
         
-        log('Get light bulb brightness...');
-        log(tBulb.brightness());
-        await sleep(500);
+        const tDevice = await select({
+            message: 'Select a device to test',
+            choices: tDevices.map(d => ({
+                name: d.objName,
+                value: d,
+                description: beautify(d, null, 2, 80)
+            })),
+        });
+        
+        if (tDevice.deviceType() == 'switch') {
+            log(`Get device by ID (${tDevice})...`);
+            tSwitch = client.getDeviceById(tDevice.objectId());
+            log({ tSwitch });
+            await sleep(200);
+            
+            log('Test Switch toggle control...');
+    
+            await tSwitch.toggle();
+            await sleep(1000);
+    
+            await tSwitch.toggle();
+            await sleep(500);
 
-        log('Test Light Bulb controls...');
-        let response = await client.deviceControl(tBulb.objectId(), 'turnOnOff', { value: '1' });
-        console.dir(response, { depth: null });
-        await sleep(500);
-
-        await tBulb.turnOff();
-        await sleep(500);
-
-        await tBulb.turnOn();
-        await sleep(500);
-
-        log('Test Light Bulb color temperatures...');
-        tBulb.setColorTemp(1000);
-        await sleep(500);
-
-        tBulb.setColorTemp(10000);
-        await sleep(500);
-
-        log('Set Light Bulb color...');
-        let color = { "hue": 78.34, "saturation": 1, "brightness": 100 };
-        log({ color });
-        await tBulb.setColor(color);
-        await sleep(500);
-
-        await tBulb.toggle();
-        await sleep(500);
+        } 
+        else if (tDevice.deviceType() == 'light') {
+            let devName = client.getDeviceById(tDevice.objectId()).name();
+            log(`Get device by Name (${devName})...`);
+            tBulb = client.getDeviceByName( devName );
+            log({ tBulb });
+            await sleep(200);
+            
+            log('Get light bulb brightness...');
+            log(tBulb.brightness());
+            await sleep(500);
+            
+            log('Test Light Bulb controls...');
+            let response = await client.deviceControl(tBulb.objectId(), 'turnOnOff', { value: '1' });
+            console.dir(response, { depth: null });
+            await sleep(500);
+    
+            await tBulb.turnOff();
+            await sleep(500);
+    
+            await tBulb.turnOn();
+            await sleep(500);
+    
+            log('Test Light Bulb color temperatures...');
+            await tBulb.setColorTemp(1000);
+            await sleep(500);
+    
+            await tBulb.setColorTemp(10000);
+            await sleep(500);
+    
+            log('Set Light Bulb color (HSL)...');
+            let color = { "hue": 78.34, "saturation": 1, "brightness": 100 };
+            log({ color });
+            await tBulb.setColor(color);
+            await sleep(500);
+    
+            log('Set Light Bulb color (RGB)...');
+            color = { "red": 230, "green": 0, "blue": 0 };
+            log({ color });
+            await tBulb.setColorRGB(color);
+            await sleep(500);
+    
+            await tBulb.toggle();
+            await sleep(500);
+        }
 
     } catch (e) {
         console.error('Failed', e);

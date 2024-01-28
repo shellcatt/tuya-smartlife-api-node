@@ -1,12 +1,12 @@
 {
   "name": "tuya-smartlife-api",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "NodeJS interface for Tuya IoT devices through the Smart Life interface",
   "main": "index.mjs",
   "type": "module",
   "scripts": {
     "cli": "node cli.js",
-    "test": "node test.mjs"
+    "test": "node test.js"
   },
   "keywords": [
     "tuya",
@@ -18,6 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "@colors/colors": "^1.6.0",
+    "@inquirer/select": "^1.3.3",
     "cli-table3": "^0.6.3",
     "commander": "^11.1.0",
     "debug": "^4.3.4",
