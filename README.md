@@ -43,7 +43,7 @@ try {
 - [x] implement pure CLI (see [Examples](#examples))
   - [x] list devices (short / long format)
   - [x] control a device's state
-  - [ ] control a device's custom attributes
+  - [x] control a device's custom attributes
 - [ ] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
 - [ ] implement unit tests
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
@@ -57,21 +57,17 @@ try {
 node cli list [--format={short|long}]
 
 # Turn device ID on / off
-node cli control <ID|Name> --state 1
-node cli control <ID|Name> --state 0
+node cli control <ID|Name> --state [1|on]
+node cli control <ID|Name> --state [0|off]
 node cli control <ID|Name> --toggle
 
-# Set light brightness
-node cli control <ID|Name> --brigntness 30
-
-# Set light color temp
-node cli control <ID|Name> --temperature 3500
-
-# Set light color
-node cli control <ID|Name> -h 78.34 -s 1 -b 100 
-
+# Set light brightness, color temp & color 
+node cli control <ID|Name> --brigntness 30 
+node cli control <ID|Name> --temperature 3500 # set warm temp
+node cli control <ID|Name> --hsv 78.34,1,100 # HSV chill green
+node cli control <ID|Name> --hsv 324.77,1,42 # HSV chill purple
+node cli control <ID|Name> --rgb 90,30,115 # RGB something
 ```
-
 
 
 ## Credits

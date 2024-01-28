@@ -96,6 +96,11 @@ export class TuyaLight extends TuyaDevice {
     }
   }
 
+  async setColorRGB(rgbColor) {
+    let hC = rgb2hsv([rgbColor.red, rgbColor.green, rgbColor.blue]);
+    this.setColor({ hue: hC['h'], saturation: hC['s'], brightness: hC['v'] });
+  }
+
   async setColorTemp(colorTemp) {
     if (colorTemp >= MIN_COLOR_TEMP && colorTemp <= MAX_COLOR_TEMP) {
       let res = await this.api.deviceControl(this.objectId(), 'colorTemperatureSet', { value: colorTemp });
@@ -108,3 +113,40 @@ export class TuyaLight extends TuyaDevice {
   }
 }
 
+
+function rgb2hsv(rgb) {
+	const r = rgb[0] / 255;
+	const g = rgb[1] / 255;
+	const b = rgb[2] / 255;
+  
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+  
+	let h, s, v = max;
+  
+	const d = max - min;
+	s = max === 0 ? 0 : d / max;
+  
+	if (max === min) {
+		h = 0; // achromatic (gray)
+	} else {
+		switch (max) {
+			case r:
+				h = (g - b) / d + (g < b ? 6 : 0);
+				break;
+			case g:
+				h = (b - r) / d + 2;
+				break;
+			case b:
+				h = (r - g) / d + 4;
+				break;
+		}
+		h /= 6;
+	}
+  
+	return {
+		h: Math.round(h * 360),
+		s: Math.round(s),
+		v: Math.round(v * 100)
+	};
+}
