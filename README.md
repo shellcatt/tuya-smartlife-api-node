@@ -2,7 +2,7 @@
 
 ## Usage 
 
-<details open>
+<details>
 <summary> <strong> Standalone </strong> </summary>
 
 - install modules with `npm install`
@@ -11,15 +11,17 @@
 
 </details>
 
-<details>
+<details open>
 	<summary> <strong> Module </strong> </summary>
 
-- install NPM package
+- install NPM package 
 ```bash
 npm install @shellcatt/tuya-smartlife-api
 ```
+
 - import ESM
 > See [test.js](./test.js)
+
 ```javascript
 import { TuyaSmartLifeClient } from "tuya-smartlife-api";
 const client = new TuyaSmartLifeClient();

@@ -1,10 +1,14 @@
 {
   "name": "tuya-smartlife-api",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "NodeJS interface for Tuya IoT devices through the Smart Life interface",
   "main": "index.mjs",
+  "bin": {
+    "tuyacli": "./cli.js"
+  },
   "type": "module",
   "scripts": {
+    "start": "node cli.js",
     "cli": "node cli.js",
     "test": "node test.js"
   },
@@ -14,8 +18,12 @@
     "smartlife",
     "homeassistant"
   ],
-  "author": "",
+  "author": "Shellcatt",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shellcatt/tuya-smartlife-api-node/issues"
+  },
+  "homepage": "https://github.com/shellcatt/tuya-smartlife-api-node#readme",
   "dependencies": {
     "@colors/colors": "^1.6.0",
     "@inquirer/select": "^1.3.3",
