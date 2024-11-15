@@ -25,8 +25,6 @@ class SmartLifeSession {
       this.devices = [];
     } 
     else if (auth.accessToken && auth.refreshToken) {
-      const NOW = Math.floor(Date.now() / 1000);
-
       this.accessToken = auth.accessToken;
       this.expireTime = auth.expireTime || 0;
       this.refreshToken = auth.refreshToken;
@@ -57,7 +55,7 @@ class SmartLifeSession {
     };
     // console.log('getAccessToken', `${this.cloudUrl}/homeassistant/auth.do`, {body}, new Date());
 
-    let response = await fetch(`${this.cloudUrl}/homeassistant/auth.do`, {
+    const response = await fetch(`${this.cloudUrl}/homeassistant/auth.do`, {
       method: 'POST',
       headers,
       // body: JSON.stringify(body),

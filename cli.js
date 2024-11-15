@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { TuyaSmartLifeClient, TuyaSmartLifeException } from './TuyaSmartLifeClient.mjs';
+import { TuyaSmartLifeClient } from './TuyaSmartLifeClient.mjs';
 import { program } from 'commander';
 import Table from 'cli-table3';
 
@@ -43,10 +43,8 @@ const icons = {
 	};
 
 async function init() {
-    const NOW = Math.floor(Date.now() / 1000);
-
 	try {
-        let cacheData = fs.readFileSync(SESSION_FILE).toString('utf8');
+        const cacheData = fs.readFileSync(SESSION_FILE).toString('utf8');
         const session = cacheData ? JSON.parse(cacheData) : {};
 
         if (!session?.accessToken) {
@@ -61,7 +59,7 @@ async function init() {
     }
 }
 
-async function finish() {
+function finish() {
 	try {
         fs.writeFileSync(SESSION_FILE, beautify(client.session, null, 2, 80));
     } catch (e) {
@@ -86,7 +84,7 @@ function renderTable({ head, rows, widths }) {
 		, colWidths: widths
 	});
 
-	for (let row of rows) {	
+	for (const row of rows) {	
 		table.push(row);
 	}
 
@@ -134,7 +132,7 @@ program
 			renderTable(tableConfig) 
 		);
 
-		await finish();
+		finish();
 	});
 
 program
