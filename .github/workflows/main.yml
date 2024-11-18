@@ -1,0 +1,36 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+  pull_request:
+    branches:
+      - main
+
+env:
+  HA_EMAIL: ${{secrets.HA_EMAIL}}
+  HA_PASS: ${{secrets.HA_PASS}}
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
+        with: 
+          node-version: "17.3"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
