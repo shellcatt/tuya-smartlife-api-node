@@ -1,6 +1,6 @@
 # Tuya Smart Life API (NodeJS) 
 
-![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=dev)
+![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=main)
 
 
 ## Usage 
