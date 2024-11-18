@@ -5,15 +5,22 @@ const debug = initDebug('api');
 
 import { getTuyaDevice } from './devices/factory.mjs'
 
-const DEFAULTREGION = 'eu';
-const TUYACLOUDURL = 'https://px1.tuya%s.com';
+export const settings = {
+  REGION: 'eu',
+  COUNTRYCODES: {
+    'eu': 44,
+    'us': 1,
+    'cn': 86
+  },
+  TUYACLOUDURL: 'https://px1.tuya%s.com',
+  
+  // In seconds 
+  REFRESH_RATE: 30,
+  REACCESS_RATE: 60 * 3,
+  REDISCOVER_RATE: 60 * 17,
+};
 
-// In seconds !
-export const REFRESH_RATE = 30; 
-export const REACCESS_RATE = 60 * 3; 
-export const REDISCOVER_RATE = 60 * 17; 
-
-class SmartLifeSession {
+export class SmartLifeSession {
 
   constructor(auth) {
     debug('SmartLifeSession.constructor', { auth });
@@ -28,7 +35,7 @@ class SmartLifeSession {
       this.accessToken = auth.accessToken;
       this.expireTime = auth.expireTime || 0;
       this.refreshToken = auth.refreshToken;
-      this.refreshTime = 0; //NOW + REFRESH_RATE;
+      this.refreshTime = 0; //NOW + settings.REFRESH_RATE;
       this.devices = auth.devices;
     } else {
       throw new TuyaSmartLifeException('Credentials not supplied.');
@@ -36,8 +43,8 @@ class SmartLifeSession {
     
     // this.lastAuth = auth.lastAuth || 0;
     this.lastUpdate = auth.lastUpdate || 0;
-    this.region = auth.region || DEFAULTREGION;
-    this.cloudUrl = format(TUYACLOUDURL, this.region).toLowerCase();
+    this.region = auth.region || settings.REGION;
+    this.cloudUrl = format(settings.TUYACLOUDURL, this.region).toLowerCase();
   }
 
   
@@ -64,7 +71,7 @@ class SmartLifeSession {
 
     const responseJson = await response.json();
 
-    if (responseJson.responseStatus === 'error') {
+    if (responseJson?.responseStatus === 'error') {
       const message = responseJson.errorMsg;
 
       if (message === 'error') {
@@ -73,9 +80,12 @@ class SmartLifeSession {
         throw new TuyaSmartLifeException(message);
       }
     }
+
     const NOW = Math.floor(Date.now() / 1000);
+    // console.log('AaAAAAAAAAAAAAAAAA' , responseJson);
     this.accessToken = responseJson.access_token;
     this.expireTime = NOW + responseJson.expires_in;
+    // console.log('expires at', Date(this.expireTime * 1000));
     // this.lastAuth = NOW;
     this.refreshToken = responseJson.refresh_token;
     // this.refreshTime = NOW + REFRESH_RATE;
@@ -96,8 +106,11 @@ class SmartLifeSession {
     const response = await fetch(`${this.cloudUrl}/homeassistant/access.do?${data}`);
     const responseJson = await response.json();
 
-    if (responseJson.responseStatus === 'error') {
-      throw new TuyaSmartLifeException('refresh token failed');
+    if (responseJson?.responseStatus === 'error') {
+      throw new TuyaSmartLifeException('Token refresh failed!', { cause: responseJson });
+    } else 
+    if (!Object.keys(responseJson).length) {
+      throw new TuyaSmartLifeException('Token refresh failed!', { cause: 'Empty response from endpoint' });
     }
 
     const NOW = Math.floor(Date.now() / 1000);
@@ -106,7 +119,7 @@ class SmartLifeSession {
     this.expireTime = NOW + responseJson.expires_in;
     // this.lastAuth = NOW;
     this.refreshToken = responseJson.refresh_token;
-    this.refreshTime = NOW + REFRESH_RATE;
+    this.refreshTime = NOW + settings.REFRESH_RATE;
   }
 
   async checkAccessToken() {
@@ -128,11 +141,13 @@ class SmartLifeSession {
       debug('Refresh token hasn\'t expired yet, skipping.');
       debug(`Expires in ${new Date(this.refreshTime*1000)}`)
     } 
-    else {
+    // Something went wrong
+    if (!this.accessToken || !this.refreshToken) {
       throw new TuyaSmartLifeException('Refresh token missing?');
     }
   }
 
+  
   toJSON() {
     return {
       region: this.region,
@@ -152,7 +167,13 @@ export class TuyaSmartLifeClient {
 
   constructor() {}
   
-  async init(username, password, countryCode, region = DEFAULTREGION, bizType = 'smart_life') {
+  async init(
+    username, 
+    password, 
+    region = settings.REGION, 
+    countryCode = settings.COUNTRYCODES[settings.REGION], 
+    bizType = 'smart_life'
+  ) {
     debug('TuyaSmartLifeClient.init()')
     this.session = new SmartLifeSession({ username, password, countryCode, region, bizType });
     await this.session.getAccessToken();
@@ -178,7 +199,7 @@ export class TuyaSmartLifeClient {
     debug('TuyaSmartLifeClient.discoverDevices()')
     const NOW = Math.floor(Date.now() / 1000);
 
-    if (!this.session?.lastUpdate || this.session?.lastUpdate + REFRESH_RATE < NOW) {
+    if (!this.session?.lastUpdate || this.session?.lastUpdate + settings.REFRESH_RATE < NOW) {
       const response = await this.request('Discovery', 'discovery');
 
       if (response.header.code == 'SUCCESS') {
@@ -187,15 +208,15 @@ export class TuyaSmartLifeClient {
         );
         debug('Discovery SUCCESS')
         this.session.lastUpdate = NOW;
-        this.session.refreshTime = NOW + REFRESH_RATE;
+        this.session.refreshTime = NOW + settings.REFRESH_RATE;
       } else if (response.header.code == 'FrequentlyInvoke') {
-        debug(`Rate limited until ${this.session.lastUpdate + REDISCOVER_RATE}`);
+        debug(`Rate limited until ${this.session.lastUpdate + settings.REDISCOVER_RATE}`);
       } else {
         throw new TuyaSmartLifeException(response.header.code);
       }
     } else {
       debug('Debug: Too soon to rediscover devices, skipping.');
-      // console.log(this.session.lastUpdate, REFRESH_RATE, NOW, this.session.refreshTime);
+      // console.log(this.session.lastUpdate, settings.REFRESH_RATE, NOW, this.session.refreshTime);
     }
     return this.session.devices;
   }
@@ -214,7 +235,7 @@ export class TuyaSmartLifeClient {
   }
 
   getDevicesByType(devType) {
-    return this.session.devices.filter((device) => device.devType() === devType);
+    return this.session.devices.filter((device) => device.deviceType() === devType);
   }
 
   getDeviceByName(devName) {
@@ -232,6 +253,10 @@ export class TuyaSmartLifeClient {
     return [success, response];
   }
 
+  async _fetch() {
+    return fetch.apply(this, arguments);
+  }
+
   async request(name, namespace, devId = null, payload = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -242,7 +267,7 @@ export class TuyaSmartLifeClient {
       name,
       namespace,
       payloadVersion: 1,
-    };
+    };fetch
 
     payload.accessToken = this.session.accessToken;
 
@@ -255,7 +280,7 @@ export class TuyaSmartLifeClient {
       payload,
     };
 
-    const response = await fetch(`${this.session.cloudUrl}/homeassistant/skill`, {
+    const response = await this._fetch(`${this.session.cloudUrl}/homeassistant/skill`, {
       method: 'POST',
       headers,
       body: JSON.stringify(data),
