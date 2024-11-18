@@ -1,0 +1,44 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'package.json'
+      - '**/*.js'
+      - '**/*.mjs'
+      - '.github/workflows/**'
+      
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - '**/*.js'
+      - '**/*.mjs'
+      - '.github/workflows/**'
+
+env:
+  HA_EMAIL: ${{secrets.HA_EMAIL}}
+  HA_PASS: ${{secrets.HA_PASS}}
+
+jobs:
+  test:
+    name: Run Mocha Tests
+    runs-on: ubuntu-latest
+
+    container: 
+      image: node:18-alpine
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
