@@ -1,4 +1,7 @@
-# Tuya Smart Life API (NodeJS)
+# Tuya Smart Life API (NodeJS) 
+
+![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=dev)
+
 
 ## Usage 
 
@@ -49,7 +52,7 @@ try {
 - [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
 - [x] implement unit tests
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
-- [ ] [~~implement TUI with blessed-contrib~~](https://github.com/shellcatt/smartlife-tu)
+- [ ] [~~implement TUI with blessed-contrib~~](https://github.com/shellcatt/smartlife-tui)
 
 ## Examples 
 
