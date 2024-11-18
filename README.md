@@ -5,9 +5,8 @@
 <details>
 <summary> <strong> Standalone </strong> </summary>
 
-- install modules with `npm install`
-- create a `.env` file (see `.env.example`)
-- run tests with `npm test`
+- install global module with `npm install -g tuya-smartlife-api`
+- verify installation with `tuyacli --version`
 
 </details>
 
@@ -18,9 +17,10 @@
 ```bash
 npm install @shellcatt/tuya-smartlife-api
 ```
+- run unit tests with `npm test`
+- run live tests with `node cli live`
 
 - import ESM
-> See [test.js](./test.js)
 
 ```javascript
 import { TuyaSmartLifeClient } from "tuya-smartlife-api";
@@ -46,17 +46,23 @@ try {
   - [x] list devices (short / long format)
   - [x] control a device's state
   - [x] control a device's custom attributes
-- [ ] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
-- [ ] implement unit tests
+- [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
+- [x] implement unit tests
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
-- [x] [~~implement TUI (blessed-contrib)~~](https://github.com/shellcatt/smartlife-tui)
+- [ ] [~~implement TUI with blessed-contrib~~](https://github.com/shellcatt/smartlife-tu)
 
 ## Examples 
 
 ```bash
 
+# Authenticate /will be automatically called later if skipped the first time/
+node cli auth
+
 # List all devices
 node cli list [--format={short|long}]
+
+# Perform interactiv device tests
+node cli test 
 
 # Turn device ID on / off
 node cli control <ID|Name> --state [1|on]
@@ -71,6 +77,9 @@ node cli control <ID|Name> --hsv 324.77,1,42 # HSV chill purple
 node cli control <ID|Name> --rgb 90,30,115 # RGB something
 ```
 
+
+> Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their name, but use with caution. 
+_`ID` would be used for large setups, where `Name` is not viable._
 
 ## Credits
 

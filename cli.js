@@ -1,67 +1,81 @@
 #!/usr/bin/env node
 
-import { TuyaSmartLifeClient } from './TuyaSmartLifeClient.mjs';
+import { TuyaSmartLifeClient, settings as TuyaDefaults } from './TuyaSmartLifeClient.mjs';
 import { program } from 'commander';
+import Configstore from 'configstore';
+import input from '@inquirer/input';
+import password from '@inquirer/password';
+import select from '@inquirer/select';
 import Table from 'cli-table3';
 
 import fs from 'fs';
+import { promisify } from 'util';
 import colors from '@colors/colors';
-import beautify from 'json-beautify';
+colors.enable();
 
+import { log } from "console";
 import initDebug from 'debug';
 const debug = initDebug('cli');
-
-import 'dotenv/config';
-
-const env = process.env;
 
 const packageJsonPath = new URL('./package.json', import.meta.url).pathname;
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
-
-const SESSION_FILE = process.cwd() + '/session.json';
+const authConfigStore = new Configstore(pkg.name);
+const sessionStore = new Configstore(`${pkg.name}_session`);
 
 const client = new TuyaSmartLifeClient();
 
 
-const actionMethods = {
-	'on': 'turnOn',
-	'off': 'turnOff',
-	'toggle': 'toggle',
+const cbInterrupt = () => {
+	console.log('Ok then.');
+	process.exit(0);
+};
+
+async function auth() {
+	const config = {};
+	config['HA_EMAIL'] = await input({ message: 'Login email', required: true }).catch(cbInterrupt);
+	config['HA_PASS'] = await password({ message: 'Login password', required: true }).catch(cbInterrupt);
+	config['HA_REGION'] = await select({
+            message: 'Region',
+            choices: [
+                { name: 'eu', value: 'eu' },
+                { name: 'us', value: 'us' },
+                { name: 'cn', value: 'cn' } // do we really?
+            ],
+            default: TuyaDefaults.REGION, 
+        }).catch(cbInterrupt);
+	config['HA_CC'] = await input({ message: 'Contry code', required: true, default: TuyaDefaults.COUNTRYCODES[config['HA_REGION']] }).catch(cbInterrupt),
+
+	authConfigStore.set('auth', config);
+
+	try {
+		await client.init(config.HA_EMAIL, config.HA_PASS, config.HA_REGION, config.HA_CC);
+	} catch (e) {
+		console.error('Error: Could not login with Tuya.', e.message);
+        process.exit(1);
+	}
 }
-const icons = {
-		'switch': `⏻ `,
-		'light': `𖤓`,
-	}, 
-	statusColor = {
-		true: 'cyan',
-		false: 'grey',
-	}, 
-	stateColor = {
-		true: 'green',
-		false: 'grey',
-	};
 
 async function init() {
 	try {
-        const cacheData = fs.readFileSync(SESSION_FILE).toString('utf8');
-        const session = cacheData ? JSON.parse(cacheData) : {};
-
-        if (!session?.accessToken) {
-            await client.init(env.HA_EMAIL, env.HA_PASS, env.HA_REGION, env.HA_CC);
+		if (!authConfigStore.has('auth')) {
+			await auth();
+		} else if (!sessionStore.has('session.accessToken')) {
+			let auth = authConfigStore.get('auth');
+            await client.init(auth.HA_EMAIL, auth.HA_PASS, auth.HA_CC, auth.HA_REGION);
         } else {
-            await client.load(session);
+            await client.load(sessionStore.get('session'));
         }
 		await client.pollDevicesUpdate();
     } catch (e) {
-        console.error('Error: Could not init Smart Life session.', e);
-        return;
+        console.error('Error: Could not init Smart Life CLI.', e);
+		process.exit(1);
     }
 }
 
 function finish() {
 	try {
-        fs.writeFileSync(SESSION_FILE, beautify(client.session, null, 2, 80));
+		sessionStore.set('session', client.session);
     } catch (e) {
         console.error('Error: Could not save Tuya session cache.', e);
     }
@@ -92,6 +106,152 @@ function renderTable({ head, rows, widths }) {
 }
 
 program
+	.command('auth')
+	.description('login with SmartLife')
+	.action(async (opts) => {
+		if (authConfigStore.has('auth')) {
+			const answer = await select({
+				message: 'Re-enter existing credentitals?',
+				choices: [
+					{ name: 'yes', value: 'yes' },
+					{ name: 'no', value: 'no' }
+				],
+				default: 'no'
+			});
+			if (answer == 'no') 
+				return;
+		}
+		await auth();
+	});
+
+program
+	.command('test')
+	.description('live test a selected device\'s functions set')
+	.action(async () => {
+		const sleep = promisify(setTimeout);
+
+		let tDevices, tBulb, tSwitch;
+
+		log(fs.readFileSync(process.cwd() + '/tuya-ha.asc').toString('utf8'));
+		await sleep(500);
+
+        log('Check authentication or existing session...');
+		await init();
+
+		log('-----');
+		await sleep(500);
+		try {
+			log('Fetch device list...');
+			tDevices = client.getAllDevices();
+
+			if (!tDevices.length) {
+				log('No devices found.');
+				return;
+			}
+
+			const answer = await select({
+				message: 'View result?',
+				choices: [
+					{
+						name: 'yes',
+						value: 'yes',
+						description: 'Print JSON and continue'
+					},
+					{
+						name: 'no',
+						value: 'no',
+						description: 'Continue'
+					}
+				],
+				default: 'no'
+			}).catch(cbInterrupt);
+			
+			if (answer == 'yes') {
+				console.dir(tDevices, { depth: null });
+			}
+			
+			const tDevice = await select({
+				message: 'Select a device to test',
+				choices: tDevices.map(d => ({
+					name: d.objName,
+					value: d,
+					description: 
+						JSON.stringify(d, undefined, '  ') 
+				})),
+			}).catch(cbInterrupt);
+			
+			if (tDevice.deviceType() == 'switch') {
+				log(`Get device by ID (${tDevice})...`);
+				tSwitch = client.getDeviceById(tDevice.objectId());
+				log({ tSwitch });
+				await sleep(200);
+				
+				log('Test Switch toggle control...');
+		
+				await tSwitch.toggle();
+				await sleep(1000);
+		
+				await tSwitch.toggle();
+				await sleep(500);
+
+			} 
+			else if (tDevice.deviceType() == 'light') {
+				let devName = client.getDeviceById(tDevice.objectId()).name();
+				log(`Get device by Name (${devName})...`);
+				tBulb = client.getDeviceByName( devName );
+				log({ tBulb });
+				await sleep(200);
+				
+				log('Get light bulb brightness...');
+				log(tBulb.brightness());
+				await sleep(500);
+				
+				log('Test Light Bulb controls...');
+				let response = await client.deviceControl(tBulb.objectId(), 'turnOnOff', { value: '1' });
+				console.dir(response, { depth: null });
+				await sleep(500);
+		
+				await tBulb.turnOff();
+				await sleep(500);
+		
+				await tBulb.turnOn();
+				await sleep(500);
+		
+				log('Test Light Bulb color temperatures...');
+				await tBulb.setColorTemp(1000);
+				await sleep(500);
+		
+				await tBulb.setColorTemp(10000);
+				await sleep(500);
+		
+				log('Set Light Bulb color (HSL)...');
+				let color = { "hue": 78.34, "saturation": 1, "brightness": 100 };
+				log({ color });
+				await tBulb.setColor(color);
+				await sleep(500);
+		
+				log('Set Light Bulb color (RGB)...');
+				color = { "red": 230, "green": 0, "blue": 0 };
+				log({ color });
+				await tBulb.setColorRGB(color);
+				await sleep(500);
+		
+				await tBulb.toggle();
+				await sleep(500);
+			}
+
+		} catch (e) {
+			console.error('Failed', e);
+		}
+		log('-----');
+
+		log('Store session to configstore...');
+		await finish();
+
+        log('Success.');
+	});
+
+program
 	.command('list')
 	.description('list devices and their state / attributes')
 	.option('--format [short|long]', 'format output', 'short')
@@ -106,6 +266,19 @@ program
 		const tDevices = client.getAllDevices();
 
 		const slices = (opts.format == 'short' ? [0, 1] : [1]); 
+		const icons = {
+				'switch': `⏻ `,
+				'light': `𖤓`,
+			}, 
+			statusColor = {
+				true: 'cyan',
+				false: 'grey',
+			}, 
+			stateColor = {
+				true: 'green',
+				false: 'grey',
+			};
+
 		const tableConfig = {
 			head: Array.prototype.slice.apply([
 				's) Device', 
@@ -132,13 +305,13 @@ program
 			renderTable(tableConfig) 
 		);
 
-		finish();
+		await finish();
 	});
 
 program
 	.command('control')
 	.description('control a device\'s state')
-	.argument('<name>', 'device name')
+	.argument('<name-or-id>', 'device name')
 	.option('-s, --state [on|off]', 'set device state')
 	.option('-x, --toggle', 'invert device state')
 	.option('-b, --brightness [1-100]', 'set device brightness')
@@ -150,6 +323,12 @@ program
 
 		await init();
 
+
+		const actionMethods = {
+			'on': 'turnOn',
+			'off': 'turnOff',
+			'toggle': 'toggle',
+		};
 		let tDevices = client.getAllDevices();
 		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
 			if (!dev.data.online) 
@@ -184,7 +363,7 @@ program
 			return dev;
 		}));
 
-		await finish();
+		await finish()
 	});
 
 // Get help
