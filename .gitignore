@@ -1,6 +1,2 @@
 node_modules/
-
-.env
-session.json
-
 .trash/
