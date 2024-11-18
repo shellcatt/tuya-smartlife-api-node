@@ -1,0 +1,37 @@
+name: Run Tests on PR
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      
+  pull_request:
+    branches:
+      - main
+
+env:
+  HA_EMAIL: ${{secrets.HA_EMAIL}}
+  HA_PASS: ${{secrets.HA_PASS}}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
+        with: 
+          node-version: 17.3
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Run tests
+      - name: Run Tests
+        run: npm test
