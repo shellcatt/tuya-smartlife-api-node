@@ -1,11 +1,12 @@
 # Tuya Smart Life API (NodeJS) 
 
-![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=main)
+![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=main) ![Releases](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/release.yml/badge.svg)
+
 
 
 ## Usage 
 
-<details>
+<details open>
 <summary> <strong> Standalone </strong> </summary>
 
 - install global module with `npm install -g tuya-smartlife-api`
@@ -29,7 +30,7 @@ npm install @shellcatt/tuya-smartlife-api
 import { TuyaSmartLifeClient } from "tuya-smartlife-api";
 const client = new TuyaSmartLifeClient();
 try {
-	await client.init('jondoe@example.co.uk', 'password', '44');
+	await client.init('jondoe@example.co.uk', 'password', 'uk');
 	await client.discoverDevices();
 
 	tDevices = client.getAllDevices();
@@ -82,7 +83,7 @@ node cli control <ID|Name> --rgb 90,30,115 # RGB something
 
 
 > Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their name, but use with caution. 
-_`ID` would be used for large setups, where `Name` is not viable._
+_`ID` would be used for large setups, where `Name` is not applicable._
 
 ## Credits
 
