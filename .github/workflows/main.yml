@@ -3,13 +3,11 @@ name: Unit Tests
 on:
   push:
     branches:
-      - main
       - dev
     paths:
       - 'package.json'
       - '**/*.js'
       - '**/*.mjs'
-      - '.github/workflows/**'
       
   pull_request:
     branches:
@@ -18,7 +16,6 @@ on:
       - 'package.json'
       - '**/*.js'
       - '**/*.mjs'
-      - '.github/workflows/**'
 
 env:
   HA_EMAIL: ${{secrets.HA_EMAIL}}
