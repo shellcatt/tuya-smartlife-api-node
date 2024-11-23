@@ -44,6 +44,7 @@ try {
 ```bash
 npm install -g tuya-smartlife-api
 ```
+
 - verify installation  
 ```bash
 tuyacli
@@ -127,21 +128,22 @@ node cli live
 
 - [x] port and optimize [TuyaPy](https://pypi.org/project/tuyapy/)
 - [x] implement integration tests
-- [x] implement pure CLI (see [Examples](#examples))
+- [x] implement pure CLI 
   - [x] list devices (short / long format)
   - [x] control a device's state
   - [x] control a device's custom attributes
 - [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
 - [x] implement unit tests
+- [ ] document code & generate JSDoc
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
 - [ ] [~~implement TUI with blessed-contrib~~](https://github.com/shellcatt/smartlife-tui)
 
 ---
-## Credits 
+## Credits ![License](https://img.shields.io/badge/license-MIT-73901d)
 
 > Inspired by [TuyaPy](https://pypi.org/project/tuyapy/) (backend) and [SmartLife](https://github.com/ndg63276/smartlife) (web) interfaces to [Tuya](https://tuya.com/)'s **[SmartAtHome](https://smartathome.co.uk/smartlife/)** for IoT smart device control. 
 
-![License](https://img.shields.io/badge/license-MIT-73901d)
+
 
 #### See also 
  - [CloudTuya](https://github.com/unparagoned/cloudtuya)
