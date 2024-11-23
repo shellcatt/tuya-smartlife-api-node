@@ -10,6 +10,7 @@ on:
       - '**/*.mjs'
       
   pull_request:
+    types: [ opened ]
     branches:
       - main
     paths:
