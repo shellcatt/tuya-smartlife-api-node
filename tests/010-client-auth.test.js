@@ -1,5 +1,5 @@
 import { TuyaSmartLifeClient, SmartLifeSession, TuyaSmartLifeException, settings as TuyaDefaults } from '../TuyaSmartLifeClient.mjs';
-import { checkEnvCredentials, authLimiter, testSessionStoreId } from './helpers.mjs';
+import { checkEnvCredentials, authLimiter, sessionStoreIdTest } from './helpers.mjs';
 
 import { expect } from 'chai';
 import { promisify } from 'util';
@@ -10,7 +10,7 @@ import Configstore from 'configstore';
 const env = process.env;
 
 
-describe('TuyaSmartLifeClient', () => {
+describe('TuyaSmartLifeClient authentication & session management', () => {
   checkEnvCredentials();
 
   const username = env.HA_EMAIL;
@@ -27,7 +27,7 @@ describe('TuyaSmartLifeClient', () => {
     
     it('should initialize persistent session store', async() => {
       try {
-        sessionStore = new Configstore(testSessionStoreId);
+        sessionStore = new Configstore(sessionStoreIdTest);
       } catch (err) {
         expect.fail('Should have initialized session store');
       }

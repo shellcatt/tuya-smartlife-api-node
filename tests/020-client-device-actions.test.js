@@ -1,17 +1,12 @@
 import { TuyaSmartLifeClient, SmartLifeSession, TuyaSmartLifeException, settings as TuyaDefaults } from '../TuyaSmartLifeClient.mjs';
-import { testSessionStoreId } from './helpers.mjs';
+import { sessionStoreIdTest } from './helpers.mjs';
 
 import { expect } from 'chai';
-import { promisify } from 'util';
-
-// const sleep = promisify(setTimeout);
 
 import Configstore from 'configstore';
 
 
-
-
-describe('TuyaSmartLifeClient', () => {
+describe('TuyaSmartLifeClient device actions', () => {
   
   let client, sessionStore;
 
@@ -23,7 +18,7 @@ describe('TuyaSmartLifeClient', () => {
     
     it('should initialize persistent session store', async() => {
       try {
-        sessionStore = new Configstore(testSessionStoreId);
+        sessionStore = new Configstore(sessionStoreIdTest);
         expect(sessionStore.get('session')).to.exist;
       } catch (err) {
         expect.fail('Should have initialized an existing session store');

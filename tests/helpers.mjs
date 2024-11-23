@@ -31,4 +31,4 @@ export function checkEnvCredentials() {
     });
 }
 
-export const testSessionStoreId = `${pkg.name}_session_test`;
+export const sessionStoreIdTest = `${pkg.name}_session_test`;
