@@ -9,7 +9,7 @@
 
 - install package **locally** 
 ```bash
-npm install @shellcatt/tuya-smartlife-api
+npm install -S tuya-smartlife-api
 ```
 
 - import ESM
@@ -86,10 +86,10 @@ node cli control <ID|Name> --state [0|off]
 node cli control <ID|Name> --toggle
 
 # Set light brightness, color temp & color 
-node cli control <ID|Name> --brigtness 30 
+node cli control <ID|Name> --brightness 30 
 node cli control <ID|Name> --temperature 3500 # set warm temp
-node cli control <ID|Name> --hsv 78.34,1,100 # HSV chill green
-node cli control <ID|Name> --hsv 324.77,1,42 # HSV chill purple
+node cli control <ID|Name> --hsl 78.34,1,100 # HSL chill green
+node cli control <ID|Name> --hsl 324.77,1,42 # HSL chill purple
 node cli control <ID|Name> --rgb 90,30,115 # RGB something
 ```
 
