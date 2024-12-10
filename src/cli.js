@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 
-import { TuyaSmartLifeClient, settings as TuyaDefaults } from './TuyaSmartLifeClient.mjs';
+import {
+	TuyaSmartLifeClient, 
+	settings as TuyaDefaults, 
+	authStoreId,
+	sessionStoreId,
+	version,
+	tuyaHA_asciiArt
+} from './index';
+
 import { program } from 'commander';
 import Configstore from 'configstore';
 import input from '@inquirer/input';
@@ -8,26 +16,22 @@ import password from '@inquirer/password';
 import select from '@inquirer/select';
 import Table from 'cli-table3';
 
-import fs from 'fs';
-import { promisify } from 'util';
+import { promisify } from 'node:util';
 import colors from '@colors/colors';
 colors.enable();
 
-import { log } from "console";
+import { log } from 'node:console';
 import initDebug from 'debug';
 const debug = initDebug('cli');
 
-const packageJsonPath = new URL('./package.json', import.meta.url).pathname;
-const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-
-const authConfigStore = new Configstore(pkg.name);
-const sessionStore = new Configstore(`${pkg.name}_session`);
+const authConfigStore = new Configstore(authStoreId);
+const sessionStore = new Configstore(sessionStoreId);
 
 const client = new TuyaSmartLifeClient();
 
 
 const cbInterrupt = () => {
-	console.log('Ok then.');
+	log('Ok then.');
 	process.exit(0);
 };
 
@@ -54,6 +58,8 @@ async function auth() {
 		console.error('Error: Could not login with Tuya.', e.message);
         process.exit(1);
 	}
+	
+	authConfigStore.set('lastLogin', Math.floor(Date.now()/1000));
 }
 
 async function init() {
@@ -132,7 +138,7 @@ program
 
 		let tDevices, tBulb, tSwitch;
 
-		log(fs.readFileSync(process.cwd() + '/tuya-ha.asc').toString('utf8'));
+		log(tuyaHA_asciiArt);
 		await sleep(500);
 
         log('Check authentication or existing session...');
@@ -376,7 +382,7 @@ program
 
 
 // Get version
-program.version(pkg.version);
+program.version(version);
 
 // Parse arguments
 program.parse(process.argv);
