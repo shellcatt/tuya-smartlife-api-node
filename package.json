@@ -1,6 +1,6 @@
 {
   "name": "tuya-smartlife-api",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Library/CLI interface for Tuya IoT devices through the Smart Life API",
   "bin": {
     "tuyacli": "./dist/cjs/cli.js"
@@ -41,6 +41,7 @@
     "cli-table3": "^0.6.3",
     "commander": "^11.1.0",
     "configstore": "^5.0.1",
+    "debug": "^4.4.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.6.1"
   },
@@ -52,7 +53,6 @@
     "@babel/register": "^7.25.9",
     "babel-plugin-transform-import-meta": "^2.2.1",
     "chai": "^4.5.0",
-    "debug": "^4.3.7",
     "mocha": "^10.8.2"
   }
 }
