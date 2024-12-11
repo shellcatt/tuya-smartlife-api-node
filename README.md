@@ -2,19 +2,24 @@
 
 ![Tests](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/main.yml/badge.svg?branch=main) ![Releases](https://github.com/shellcatt/tuya-smartlife-api-node/actions/workflows/release.yml/badge.svg)
 
-## Usage   [![requirements](https://img.shields.io/badge/Requires-NPM-blue)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+## Usage  [![requirements](https://img.shields.io/badge/requires-NodeJS-blue?logo=nodedotjs)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
 <details x-open>
 	<summary> <strong> Module </strong> </summary>
 
 - install package **locally** 
 ```bash
-npm install @shellcatt/tuya-smartlife-api
+npm install -S tuya-smartlife-api
 ```
 
-- import ESM
+
+- import module (ESM or CJS)
 ```javascript
+/* ESM */
 import { TuyaSmartLifeClient } from "tuya-smartlife-api";
+/* CommonJS */
+// const TuyaSmartLifeClient = require("tuya-smartlife-api").TuyaSmartLifeClient;
+
 const client = new TuyaSmartLifeClient();
 try {
 	await client.init('jondoe@example.co.uk', 'password', 'eu');
@@ -23,8 +28,8 @@ try {
 	const tDevices = client.getAllDevices();
 	console.log(tDevices);
 
-	const myFirstBulb = await client.getDevicesByType('light')[0];
-	await myFirstBulb.turnOn();
+	const myLightBulbs = await client.getDevicesByType('light');
+	await myLightBulbs[0].turnOn();
 
 } catch (e) {
 	console.error('Failed because', e);
@@ -72,27 +77,28 @@ Commands:
 ```bash
 
 # Authenticate /will be automatically called later if skipped the first time/
-node cli auth
+tuyacli auth
 
 # List all devices
-node cli list [--format={short|long}]
+tuyacli list [--format={short|long}]
 
 # Perform interactiv device tests
-node cli test 
+tuyacli test 
 
 # Turn device ID on / off
-node cli control <ID|Name> --state [1|on]
-node cli control <ID|Name> --state [0|off]
-node cli control <ID|Name> --toggle
+tuyacli control <ID|Name> --state [1|on]
+tuyacli control <ID|Name> --state [0|off]
+tuyacli control <ID|Name> --toggle
 
 # Set light brightness, color temp & color 
-node cli control <ID|Name> --brigntness 30 
-node cli control <ID|Name> --temperature 3500 # set warm temp
-node cli control <ID|Name> --hsv 78.34,1,100 # HSV chill green
-node cli control <ID|Name> --hsv 324.77,1,42 # HSV chill purple
-node cli control <ID|Name> --rgb 90,30,115 # RGB something
+tuyacli control <ID|Name> --brightness 30 
+tuyacli control <ID|Name> --temperature 3500 # set warm temp
+tuyacli control <ID|Name> --hsl 78.34,1,100 # HSL chill green
+tuyacli control <ID|Name> --hsl 324.77,1,42 # HSL chill purple
+tuyacli control <ID|Name> --rgb 90,30,115 # RGB something
 ```
 
+> Note: Use `node tuyacli` in module's root folder if not installed globally.
 
 > Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their name, but use with caution. 
 _`ID` would be used for large setups, where `Name` is not applicable._
@@ -114,8 +120,11 @@ npm test
 	<summary> <strong> Interactive tests  </strong> </summary>
 
 ```bash
-node cli live
+tuyacli live
 ```
+
+> Note: Use `node tuyacli` in module's root folder if not installed globally.
+
 
 </details>
 <br>
@@ -135,6 +144,7 @@ node cli live
 - [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
 - [x] implement unit tests
 - [ ] document code & generate JSDoc
+- [ ] dockerize
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
 - [ ] [~~implement TUI with blessed-contrib~~](https://github.com/shellcatt/smartlife-tui)
 

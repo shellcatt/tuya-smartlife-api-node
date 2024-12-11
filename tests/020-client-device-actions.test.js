@@ -1,7 +1,11 @@
-import { TuyaSmartLifeClient, SmartLifeSession, TuyaSmartLifeException, settings as TuyaDefaults } from '../TuyaSmartLifeClient.mjs';
-import { sessionStoreIdTest } from './helpers.mjs';
+import {
+  TuyaSmartLifeClient,
+  sessionStoreIdTest 
+} from '../src/index';
+
 
 import { expect } from 'chai';
+import { describe } from 'mocha';
 
 import Configstore from 'configstore';
 

@@ -1,4 +1,4 @@
-import { TuyaDevice } from './base.mjs';
+import { TuyaDevice } from './base';
 
 export class TuyaScene extends TuyaDevice {
     available() {

@@ -1,14 +1,21 @@
 {
   "name": "tuya-smartlife-api",
-  "version": "0.7.7",
+  "version": "0.8.0",
   "description": "Library/CLI interface for Tuya IoT devices through the Smart Life API",
-  "main": "index.mjs",
   "bin": {
-    "tuyacli": "./cli.js"
+    "tuyacli": "./dist/cjs/cli.js"
   },
-  "type": "module",
   "scripts": {
-    "test": "mocha --timeout 240000 'tests/**/*.test.js'"
+    "test": "mocha --require @babel/register --timeout 240000 'tests/**/*.test.*s'",
+    "build:esm": "BABEL_ENV=build-esm npx babel src/ --out-dir dist/esm",
+    "build:cjs": "BABEL_ENV=build-cjs npx babel src/ --out-dir dist/cjs",
+    "build": "npm run build:esm && npm run build:cjs",
+    "clean": "rm -rf dist/*"
+  },
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/esm/index.js",
+    "default": "./dist/esm/index.js"
   },
   "keywords": [
     "cli",
@@ -33,12 +40,18 @@
     "@inquirer/select": "^1.3.3",
     "cli-table3": "^0.6.3",
     "commander": "^11.1.0",
-    "configstore": "^7.0.0",
+    "configstore": "^5.0.1",
     "dotenv": "^16.3.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "chai": "^5.1.2",
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/register": "^7.25.9",
+    "babel-plugin-transform-import-meta": "^2.2.1",
+    "chai": "^4.5.0",
     "debug": "^4.3.7",
     "mocha": "^10.8.2"
   }
