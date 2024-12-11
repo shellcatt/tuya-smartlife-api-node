@@ -40,6 +40,7 @@ export class SmartLifeSession {
       this.refreshTime = 0; //NOW + settings.REFRESH_RATE;
       this.devices = auth.devices;
     } else {
+      console.debug({auth});
       throw new TuyaSmartLifeException('Credentials not supplied.');
     }
     
