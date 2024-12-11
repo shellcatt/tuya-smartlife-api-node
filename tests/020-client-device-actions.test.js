@@ -25,6 +25,7 @@ describe('TuyaSmartLifeClient device actions', () => {
         sessionStore = new Configstore(sessionStoreIdTest);
         expect(sessionStore.get('session')).to.exist;
       } catch (err) {
+        console.error(err);
         expect.fail('Should have initialized an existing session store');
       }
 
@@ -35,6 +36,7 @@ describe('TuyaSmartLifeClient device actions', () => {
         expect(client.session.accessToken).to.not.be.empty
         expect(client.session.refreshToken).to.not.be.empty;
       } catch (err) {
+        console.error(err);
         expect.fail('Should have loaded session to client');
       }
     });
