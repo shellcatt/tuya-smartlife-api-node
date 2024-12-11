@@ -76,6 +76,7 @@ describe('TuyaSmartLifeClient authentication & session management', () => {
       try {
         authStore.set('lastLogin', Math.floor(Date.now()/1000));
       } catch (err) {
+        console.error(err);
         expect.fail('Should have stored last login', err);
       }
     })
@@ -84,6 +85,7 @@ describe('TuyaSmartLifeClient authentication & session management', () => {
       try {
         sessionStore.set('session', client.session)
       } catch (err) {
+        console.error(err);
         expect.fail('Should have stored the session');
       }
     });
