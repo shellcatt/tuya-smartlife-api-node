@@ -1,16 +1,29 @@
-import { TuyaSmartLifeClient, SmartLifeSession, TuyaSmartLifeException, settings as TuyaDefaults } from '../TuyaSmartLifeClient.mjs';
-import { checkEnvCredentials, authLimiter, sessionStoreIdTest } from './helpers.mjs';
+import {
+  TuyaSmartLifeClient, 
+  SmartLifeSession, 
+  TuyaSmartLifeException, 
+  settings as TuyaDefaults,
+  authStoreId,
+  sessionStoreIdTest 
+} from '../src/index';
+
+import { 
+  checkEnvCredentials
+} from './helpers';
 
 import { expect } from 'chai';
-import { promisify } from 'util';
-import { readFileSync } from 'fs';
+import { describe } from 'mocha';
+
+import { promisify } from 'node:util';
 const sleep = promisify(setTimeout);
 
 import Configstore from 'configstore';
+
 const env = process.env;
 
 
 describe('TuyaSmartLifeClient authentication & session management', () => {
+  
   checkEnvCredentials();
 
   const username = env.HA_EMAIL;
@@ -18,15 +31,16 @@ describe('TuyaSmartLifeClient authentication & session management', () => {
   const region = env.HA_REGION || TuyaDefaults.REGION;
   const countryCode = env.HA_CC || TuyaDefaults.COUNTRYCODES[region];
 
-  let client, sessionStore;
+  let client, authStore, sessionStore;
 
   describe('client init()', () => {
     before('create client', () => {
       client = new TuyaSmartLifeClient();
     });
     
-    it('should initialize persistent session store', async() => {
+    it('should initialize persistent auth & session store', async() => {
       try {
+        authStore = new Configstore(authStoreId);
         sessionStore = new Configstore(sessionStoreIdTest);
       } catch (err) {
         expect.fail('Should have initialized session store');
@@ -39,7 +53,7 @@ describe('TuyaSmartLifeClient authentication & session management', () => {
       } catch (err) {
         if (err instanceof TuyaSmartLifeException && err.message.includes(`${env.LOGIN_INTERVAL}`)) {
           const NOW = Math.floor(Date.now() / 1000);
-          const lastLogin = authLimiter.getLastLogin() || NOW;
+          const lastLogin = authConfigStore.get('lastLogin') || NOW;
           const duration = Math.abs((lastLogin + Number(env.LOGIN_INTERVAL)) - NOW);
           // console.log({lastLogin, 'interval': env.LOGIN_INTERVAL, NOW, duration});
           console.log(`last login was at ${(Date(lastLogin*1000))}, so retrying after ${duration} seconds...`);
@@ -58,17 +72,19 @@ describe('TuyaSmartLifeClient authentication & session management', () => {
       expect(client.session.countryCode).to.equal(countryCode);
     });
 
+    it('should store last login', async () => {
+      try {
+        authStore.set('lastLogin', Math.floor(Date.now()/1000));
+      } catch (err) {
+        expect.fail('Should have stored last login', err);
+      }
+    })
+
     it('should store a persistent session', async() => {
       try {
         sessionStore.set('session', client.session)
       } catch (err) {
         expect.fail('Should have stored the session');
-      }
-
-      try {
-        authLimiter.setLastLogin();
-      } catch (err) {
-        expect.fail('Should set last login');
       }
     });
 

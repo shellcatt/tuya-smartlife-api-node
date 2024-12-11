@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
-import { format } from 'util';
+import { format } from 'node:util';
 import initDebug from 'debug';
 const debug = initDebug('api');
 
-import { getTuyaDevice } from './devices/factory.mjs'
+import { 
+  getTuyaDevice
+} from './devices/factory'
 
 export const settings = {
   REGION: 'eu',
@@ -82,7 +84,6 @@ export class SmartLifeSession {
     }
 
     const NOW = Math.floor(Date.now() / 1000);
-    // console.log('AaAAAAAAAAAAAAAAAA' , responseJson);
     this.accessToken = responseJson.access_token;
     this.expireTime = NOW + responseJson.expires_in;
     // console.log('expires at', Date(this.expireTime * 1000));
@@ -267,7 +268,7 @@ export class TuyaSmartLifeClient {
       name,
       namespace,
       payloadVersion: 1,
-    };fetch
+    };
 
     payload.accessToken = this.session.accessToken;
 
