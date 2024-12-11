@@ -100,7 +100,7 @@ tuyacli control <ID|Name> --rgb 90,30,115 # RGB something
 
 > Note: Use `node tuyacli` in module's root folder if not installed globally.
 
-> Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their name, but use with caution. 
+> Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `tuyacli control bulb -s off` would turn off all devices with the pattern "bulb" in their names, but use with caution. 
 _`ID` would be used for large setups, where `Name` is not applicable._
 
 
@@ -120,7 +120,7 @@ npm test
 	<summary> <strong> Interactive tests  </strong> </summary>
 
 ```bash
-tuyacli live
+tuyacli test
 ```
 
 > Note: Use `node tuyacli` in module's root folder if not installed globally.
@@ -142,7 +142,9 @@ tuyacli live
   - [x] control a device's state
   - [x] control a device's custom attributes
 - [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
+  - [ ] encrypt credentials at rest 
 - [x] implement unit tests
+- [x] add support for CommonJS
 - [ ] document code & generate JSDoc
 - [ ] dockerize
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
