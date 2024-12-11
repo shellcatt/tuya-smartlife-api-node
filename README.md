@@ -100,7 +100,7 @@ tuyacli control <ID|Name> --rgb 90,30,115 # RGB something
 
 > Note: Use `node tuyacli` in module's root folder if not installed globally.
 
-> Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their name, but use with caution. 
+> Note: The `<ID|Name>` portion is treated as a **filtering pattern** rather than a full identifier. Conviniently, `node cli control bulb -s off` would turn off all devices with the pattern "bulb" in their names, but use with caution. 
 _`ID` would be used for large setups, where `Name` is not applicable._
 
 
@@ -120,7 +120,7 @@ npm test
 	<summary> <strong> Interactive tests  </strong> </summary>
 
 ```bash
-tuyacli live
+tuyacli test
 ```
 
 > Note: Use `node tuyacli` in module's root folder if not installed globally.
