@@ -1,5 +1,5 @@
-import { TuyaLight } from './light.mjs';
-import { TuyaSwitch } from './switch.mjs';
+import { TuyaLight } from './light';
+import { TuyaSwitch } from './switch';
 // import { TuyaClimate } from './climate.mjs';
 // import { TuyaScene } from './scene.mjs';
 // import { TuyaFanDevice } from './fan.mjs';

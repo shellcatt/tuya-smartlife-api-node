@@ -1,4 +1,4 @@
-import { TuyaDevice } from './base.mjs';
+import { TuyaDevice } from './base';
 
 const MIN_COLOR_TEMP = 1000;
 const MAX_COLOR_TEMP = 10000;

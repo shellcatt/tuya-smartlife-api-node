@@ -24,6 +24,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # Use the npm token stored in GitHub secrets
         run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
 
-      - name: Install Dependencies
-        run: npm publish --access public
+      - name: Build sources
+        run: npm run build
+        
+      - name: Publish to registry
+        run: npm publish
         

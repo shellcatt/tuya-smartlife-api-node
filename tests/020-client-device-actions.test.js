@@ -1,7 +1,11 @@
-import { TuyaSmartLifeClient, SmartLifeSession, TuyaSmartLifeException, settings as TuyaDefaults } from '../TuyaSmartLifeClient.mjs';
-import { sessionStoreIdTest } from './helpers.mjs';
+import {
+  TuyaSmartLifeClient,
+  sessionStoreIdTest 
+} from '../src/index';
+
 
 import { expect } from 'chai';
+import { describe } from 'mocha';
 
 import Configstore from 'configstore';
 
@@ -20,7 +24,9 @@ describe('TuyaSmartLifeClient device actions', () => {
       try {
         sessionStore = new Configstore(sessionStoreIdTest);
         expect(sessionStore.get('session')).to.exist;
+        console.debug('loaded session', sessionStore.get('session'))
       } catch (err) {
+        console.error(err);
         expect.fail('Should have initialized an existing session store');
       }
 
@@ -31,6 +37,7 @@ describe('TuyaSmartLifeClient device actions', () => {
         expect(client.session.accessToken).to.not.be.empty
         expect(client.session.refreshToken).to.not.be.empty;
       } catch (err) {
+        console.error(err);
         expect.fail('Should have loaded session to client');
       }
     });
