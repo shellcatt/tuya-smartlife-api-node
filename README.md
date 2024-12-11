@@ -142,7 +142,9 @@ tuyacli test
   - [x] control a device's state
   - [x] control a device's custom attributes
 - [x] use [Configstore](https://www.npmjs.com/package/configstore) for credentials & device cache _(not `session.json`)_
+  - [ ] encrypt credentials at rest 
 - [x] implement unit tests
+- [x] add support for CommonJS
 - [ ] document code & generate JSDoc
 - [ ] dockerize
 - [ ] implement classes for other IoT devices (climate, fan, lock, etc.)
