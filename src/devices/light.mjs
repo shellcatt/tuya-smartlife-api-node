@@ -1,5 +1,9 @@
 import { TuyaDevice } from './base';
 
+
+const MIN_BRIGHTNESS = 0;
+const MAX_BRIGHTNESS = 100;
+
 const MIN_COLOR_TEMP = 1000;
 const MAX_COLOR_TEMP = 10000;
 
@@ -66,12 +70,16 @@ export class TuyaLight extends TuyaDevice {
 
   async setBrightness(brightness) {
     const value = parseInt(brightness);
-    let res = await this.api.deviceControl(this.objectId(), 'brightnessSet', { value });
-    if (res[0]) {
-      this.data.brightness = value;
+    if (value >= MIN_BRIGHTNESS && value <= MAX_BRIGHTNESS) {
+      const res = await this.api.deviceControl(this.objectId(), 'brightnessSet', { value });
+      if (res[0]) {
+        this.data.brightness = value;
+      } else {
+        console.error('could not set brightness');
+        console.debug(res[1]);
+      }
     } else {
-      console.error('could not set brightness');
-      console.debug(res[1]);
+      console.error(`Brightness value '${value}' out of range (${MIN_BRIGHTNESS} - ${MAX_BRIGHTNESS}).`);
     }
   }
 
@@ -102,17 +110,18 @@ export class TuyaLight extends TuyaDevice {
   }
 
   async setColorTemp(colorTemp) {
-    if (colorTemp >= MIN_COLOR_TEMP && colorTemp <= MAX_COLOR_TEMP) {
-      let res = await this.api.deviceControl(this.objectId(), 'colorTemperatureSet', { value: colorTemp });
+    const value = parseInt(colorTemp);
+    if (value >= MIN_COLOR_TEMP && value <= MAX_COLOR_TEMP) {
+      const res = await this.api.deviceControl(this.objectId(), 'colorTemperatureSet', { value });
       if (res[0]) {
-        this.data.color_temp = colorTemp;
+        this.data.color_temp = value;
         this.data.color_mode = 'white';  // Soft set 
       } else {
         console.error('could not set color temp');
         console.debug(res[1]);
       }
     } else {
-      console.error('Color temp value out of range.')
+      console.error(`Color temp value '${value}' out of range (${MIN_COLOR_TEMP} - ${MAX_COLOR_TEMP}).`);
     }
   }
 }
