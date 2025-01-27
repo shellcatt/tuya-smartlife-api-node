@@ -57,11 +57,11 @@ export class TuyaLight extends TuyaDevice {
 
   
   supportColor() {
-    return this.data.color !== null;
+    return !!this.data.color;
   }
 
   supportColorTemp() {
-    return this.data.color_temp !== null;
+    return !!this.data.color_temp;
   }
 
   hsColor() {
