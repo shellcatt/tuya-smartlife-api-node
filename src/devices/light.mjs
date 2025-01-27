@@ -40,15 +40,15 @@ export class TuyaLight extends TuyaDevice {
     const workMode = this.data.color_mode;
     if (workMode === 'colour' && this.data.color) {
       const color = this.data.color;
-      return Math.round((color.brightness * 255) / 100);
+      return Math.round((parseInt(color.brightness) * 255) / 100);
     } else {
-      return this.data.brightness;
+      return parseInt(this.data.brightness);
     }
   }
 
   _setBrightness(brightness) {
     const workMode = this.data.color_mode;
-    if (workMode === 'colour') {
+    if (workMode === 'colour' && this.data.color) {
       this.data.color.brightness = brightness;
     } else {
       this.data.brightness = brightness;
@@ -82,7 +82,7 @@ export class TuyaLight extends TuyaDevice {
   }
 
   async setBrightness(brightness) {
-    const value = Math.round((brightness * 100) / 255);
+    const value = parseInt(brightness)
     let res = this.api.deviceControl(this.objectId(), 'brightnessSet', { value });
     if (res[0]) {
       this.data.brightness = value;
