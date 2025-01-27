@@ -336,9 +336,12 @@ program
 		};
 		let tDevices = client.getAllDevices();
 		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
-			if (!dev.data.online)
+			// Known issue: device status is propagated once every N minutes
+			// so that shouldn't stop us from trying
+			if (0 && !dev.data.online) {
 				return;
-			
+			}
+
 			if (opts.state) {
 				if (!Object.keys(actionMethods).includes(opts.state)) {
 					console.error('Error: Invalid options format? Use DEBUG=cli');
