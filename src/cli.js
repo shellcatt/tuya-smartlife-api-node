@@ -48,9 +48,7 @@ async function auth() {
             ],
             default: TuyaDefaults.REGION, 
         }).catch(cbInterrupt);
-	config['HA_CC'] = await input({ message: 'Contry code', required: true, default: TuyaDefaults.COUNTRYCODES[config['HA_REGION']] }).catch(cbInterrupt),
-
-	authConfigStore.set('auth', config);
+	config['HA_CC'] = await input({ message: 'Contry code', required: true, default: TuyaDefaults.COUNTRYCODES[config['HA_REGION']] }).catch(cbInterrupt);
 
 	try {
 		await client.init(config.HA_EMAIL, config.HA_PASS, config.HA_REGION, config.HA_CC);
@@ -59,6 +57,7 @@ async function auth() {
         process.exit(1);
 	}
 	
+	authConfigStore.set('auth', config);
 	authConfigStore.set('lastLogin', Math.floor(Date.now()/1000));
 }
 
@@ -337,9 +336,9 @@ program
 		};
 		let tDevices = client.getAllDevices();
 		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
-			if (!dev.data.online) 
+			if (!dev.data.online)
 				return;
-
+			
 			if (opts.state) {
 				if (!Object.keys(actionMethods).includes(opts.state)) {
 					console.error('Error: Invalid options format? Use DEBUG=cli');
