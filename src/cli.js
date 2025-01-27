@@ -48,9 +48,7 @@ async function auth() {
             ],
             default: TuyaDefaults.REGION, 
         }).catch(cbInterrupt);
-	config['HA_CC'] = await input({ message: 'Contry code', required: true, default: TuyaDefaults.COUNTRYCODES[config['HA_REGION']] }).catch(cbInterrupt),
-
-	authConfigStore.set('auth', config);
+	config['HA_CC'] = await input({ message: 'Contry code', required: true, default: TuyaDefaults.COUNTRYCODES[config['HA_REGION']] }).catch(cbInterrupt);
 
 	try {
 		await client.init(config.HA_EMAIL, config.HA_PASS, config.HA_REGION, config.HA_CC);
@@ -59,6 +57,7 @@ async function auth() {
         process.exit(1);
 	}
 	
+	authConfigStore.set('auth', config);
 	authConfigStore.set('lastLogin', Math.floor(Date.now()/1000));
 }
 
@@ -80,6 +79,7 @@ async function init() {
 }
 
 function finish() {
+	debug(`Finished, storing session`);
 	try {
 		sessionStore.set('session', client.session);
     } catch (e) {
@@ -223,6 +223,10 @@ program
 				await tBulb.turnOn();
 				await sleep(500);
 		
+				log('Test Light Bulb color brightness...');
+				await tBulb.setBrightness(50);
+				await sleep(500);
+
 				log('Test Light Bulb color temperatures...');
 				await tBulb.setColorTemp(1000);
 				await sleep(500);
@@ -337,8 +341,11 @@ program
 		};
 		let tDevices = client.getAllDevices();
 		tDevices = await Promise.all(tDevices.filter((dev) => (~dev.objName.toLowerCase().indexOf(device.toLowerCase()) || dev.objId == device)).map(async (dev) => {			
-			if (!dev.data.online) 
+			// Known issue: device status is propagated once every N minutes
+			// so that shouldn't stop us from trying
+			if (0 && !dev.data.online) {
 				return;
+			}
 
 			if (opts.state) {
 				if (!Object.keys(actionMethods).includes(opts.state)) {
@@ -351,7 +358,7 @@ program
 				debug(`Invoking toggle on ${dev.objName}`);
 				await dev.toggle();
 			} else if (opts.brightness) {
-				debug(`Invoking setBrightnes on ${dev.objName}`);
+				debug(`Invoking setBrightness on ${dev.objName}`);
 				await dev.setBrightness(opts.brightness);
 			} else if (opts.temperature) {
 				debug(`Invoking setColorTemp on ${dev.objName}`);
@@ -365,11 +372,10 @@ program
 				debug(`Invoking setColor on ${dev.objName} with RGB: ${JSON.stringify({ red, green, blue })}`);
 				await dev.setColorRGB({ red, green, blue });
 			}
-
-			return dev;
+			return Promise.resolve(dev);
 		}));
-
-		await finish()
+		
+		await finish();
 	});
 
 // Get help
