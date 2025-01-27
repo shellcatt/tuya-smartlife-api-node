@@ -37,12 +37,7 @@ export class TuyaLight extends TuyaDevice {
   }
 
   brightness() {
-    if (this.data.color_mode === 'colour' && this.data.color) {
-      const color = this.data.color;
-      return Math.round((parseInt(color.brightness) * 255) / 100);
-    } else {
-      return parseInt(this.data.brightness);
-    }
+    return parseInt(this.data.brightness);
   }
   
   supportColor() {
