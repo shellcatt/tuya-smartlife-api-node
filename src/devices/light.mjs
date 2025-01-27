@@ -37,8 +37,7 @@ export class TuyaLight extends TuyaDevice {
   }
 
   brightness() {
-    const workMode = this.data.color_mode;
-    if (workMode === 'colour' && this.data.color) {
+    if (this.data.color_mode === 'colour' && this.data.color) {
       const color = this.data.color;
       return Math.round((parseInt(color.brightness) * 255) / 100);
     } else {
@@ -56,8 +55,7 @@ export class TuyaLight extends TuyaDevice {
 
   hsColor() {
     if (this.data.color) {
-      const workMode = this.data.color_mode;
-      if (workMode === 'colour') {
+      if (this.data.color_mode === 'colour' && this.data.color) {
         const color = this.data.color;
         return [color.hue, color.saturation];
       } else {
@@ -72,10 +70,13 @@ export class TuyaLight extends TuyaDevice {
   }
 
   async setBrightness(brightness) {
-    const value = parseInt(brightness)
-    let res = this.api.deviceControl(this.objectId(), 'brightnessSet', { value });
+    const value = parseInt(brightness);
+    let res = await this.api.deviceControl(this.objectId(), 'brightnessSet', { value });
     if (res[0]) {
       this.data.brightness = value;
+    } else {
+      console.error('could not set brightness');
+      console.debug(res[1]);
     }
   }
 
@@ -94,6 +95,9 @@ export class TuyaLight extends TuyaDevice {
       } else {
           this.data.color_mode = 'colour'; 
       }
+    } else {
+      console.error('could not set color');
+      console.debug(res[1]);
     }
   }
 
@@ -108,6 +112,9 @@ export class TuyaLight extends TuyaDevice {
       if (res[0]) {
         this.data.color_temp = colorTemp;
         this.data.color_mode = 'white';  // Soft set 
+      } else {
+        console.error('could not set color temp');
+        console.debug(res[1]);
       }
     } else {
       console.error('Color temp value out of range.')
