@@ -82,13 +82,24 @@ export class TuyaLight extends TuyaDevice {
   async setColor(hsbColor) {
     let res = await this.api.deviceControl(this.objectId(), 'colorSet', { color: hsbColor });
     if (res[0]) {
-      this.data.color = hsbColor;
+      this.data.color = hsbColor; // Legacy
+      
+      // Soft set, for actual device update is delayed
+      if (
+        hsbColor['hue'] == 0 
+        && hsbColor['saturation'] == 0 
+        &&  hsbColor['brightness'] == 100
+      ) {
+          this.data.color_mode = 'white'; 
+      } else {
+          this.data.color_mode = 'colour'; 
+      }
     }
   }
 
   async setColorRGB(rgbColor) {
     let hC = rgb2hsv([rgbColor.red, rgbColor.green, rgbColor.blue]);
-    this.setColor({ hue: hC['h'], saturation: hC['s'], brightness: hC['v'] });
+    await this.setColor({ hue: hC['h'], saturation: hC['s'], brightness: hC['v'] });
   }
 
   async setColorTemp(colorTemp) {
@@ -96,6 +107,7 @@ export class TuyaLight extends TuyaDevice {
       let res = await this.api.deviceControl(this.objectId(), 'colorTemperatureSet', { value: colorTemp });
       if (res[0]) {
         this.data.color_temp = colorTemp;
+        this.data.color_mode = 'white';  // Soft set 
       }
     } else {
       console.error('Color temp value out of range.')

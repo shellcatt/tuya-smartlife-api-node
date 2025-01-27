@@ -79,6 +79,7 @@ async function init() {
 }
 
 function finish() {
+	debug(`Finished, storing session`);
 	try {
 		sessionStore.set('session', client.session);
     } catch (e) {
@@ -371,11 +372,10 @@ program
 				debug(`Invoking setColor on ${dev.objName} with RGB: ${JSON.stringify({ red, green, blue })}`);
 				await dev.setColorRGB({ red, green, blue });
 			}
-
-			return dev;
+			return Promise.resolve(dev);
 		}));
-
-		await finish()
+		
+		await finish();
 	});
 
 // Get help
