@@ -222,6 +222,10 @@ program
 				await tBulb.turnOn();
 				await sleep(500);
 		
+				log('Test Light Bulb color brightness...');
+				await tBulb.setBrightness(50);
+				await sleep(500);
+
 				log('Test Light Bulb color temperatures...');
 				await tBulb.setColorTemp(1000);
 				await sleep(500);
@@ -353,7 +357,7 @@ program
 				debug(`Invoking toggle on ${dev.objName}`);
 				await dev.toggle();
 			} else if (opts.brightness) {
-				debug(`Invoking setBrightnes on ${dev.objName}`);
+				debug(`Invoking setBrightness on ${dev.objName}`);
 				await dev.setBrightness(opts.brightness);
 			} else if (opts.temperature) {
 				debug(`Invoking setColorTemp on ${dev.objName}`);
